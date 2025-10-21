@@ -117,6 +117,20 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
     lv_display_set_driver_data(disp, dsc);
     window_create(disp);
 
+    SDL_Renderer* renderer = lv_sdl_window_get_renderer(disp);
+    if (renderer != NULL) {
+        SDL_RendererInfo info;
+        SDL_GetRendererInfo(renderer, &info);
+
+        if ((info.flags & SDL_RENDERER_ACCELERATED) != 0) {
+            LV_LOG_USER("Using hardware accelerated renderer");
+        } else {
+            LV_LOG_USER("Using software renderer");
+        }
+
+        LV_LOG_USER("Renderer name: %s", info.name);
+    }
+
     lv_display_set_flush_cb(disp, flush_cb);
 
 #if LV_USE_DRAW_SDL == 0
