@@ -10,6 +10,7 @@
 #include "../../stdlib/lv_sprintf.h"
 #include "../lv_assert.h"
 #include "lv_cache_entry_private.h"
+#include "lv_cache_private.h"
 
 /*********************
  *      DEFINES
@@ -165,6 +166,8 @@ void lv_cache_entry_delete(lv_cache_entry_t * entry)
     if(entry->flags & LV_CACHE_ENTRY_FLAG_DISABLE_DELETE) {
         return;
     }
+
+    LV_LOG_USER("lv_cache_entry_delete: %s", entry->cache->name);
 
     void * data = lv_cache_entry_get_data(entry);
     lv_free(data);

@@ -354,6 +354,7 @@ static lv_cache_entry_t * cache_add_internal_no_lock(lv_cache_t * cache, const v
             return NULL;
 
     lv_cache_entry_t * entry = cache->clz->add_cb(cache, key, user_data);
+    LV_LOG_USER("lv_cache_add_internal_no_lock: %s", cache->name);
 
     return entry;
 }
