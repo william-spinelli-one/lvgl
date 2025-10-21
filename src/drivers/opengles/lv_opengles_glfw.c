@@ -127,7 +127,11 @@ lv_opengles_window_t * lv_opengles_glfw_window_create_ex(int32_t hor_res, int32_
 
     /* Create window with graphics context */
     lv_opengles_window_t * existing_window = lv_ll_get_head(&glfw_window_ll);
-    window->window = glfwCreateWindow(hor_res, ver_res, title, NULL,
+    // Fullscreen
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    // Windowed
+    // GLFWmonitor* monitor = NULL;
+    window->window = glfwCreateWindow(hor_res, ver_res, title, monitor,
                                       existing_window ? existing_window->window : NULL);
     if(window->window == NULL) {
         LV_LOG_ERROR("glfwCreateWindow fail");
