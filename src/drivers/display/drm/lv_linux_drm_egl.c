@@ -67,6 +67,27 @@ static void drm_destroy_window(void * driver_data, void * native_window);
 static size_t drm_egl_select_config_cb(void * driver_data, const lv_egl_config_t * configs, size_t config_count);
 static inline void set_viewport(lv_display_t * display);
 
+static void check_egl_renderer(void)
+{
+    const char *vendor = (const char *) glGetString(GL_VENDOR);
+    const char *renderer = (const char *) glGetString(GL_RENDERER);
+    const char *version = (const char *) glGetString(GL_VERSION);
+
+    if (vendor && renderer) {
+        LV_LOG_USER("EGL Vendor:   %s", vendor);
+        LV_LOG_USER("EGL Renderer: %s", renderer);
+        LV_LOG_USER("EGL Version:  %s", version);
+
+        if (strstr(renderer, "llvmpipe") || strstr(renderer, "softpipe") || strstr(renderer, "Mesa")) {
+            LV_LOG_USER("Software rendering detected.");
+        } else {
+            LV_LOG_USER("Hardware acceleration active.");
+        }
+    } else {
+        LV_LOG_USER("EGL/GL not initialized properly.");
+    }
+}
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -121,6 +142,8 @@ void lv_linux_drm_set_file(lv_display_t * display, const char * file, int64_t co
         LV_LOG_ERROR("Failed to create egl context");
         return;
     }
+
+    check_egl_renderer();
 
     /* Let the opengles texture driver handle the texture lifetime */
     ctx->texture.is_texture_owner = true;
@@ -240,7 +263,7 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
         GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB565, disp_width, disp_height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5,
                              ctx->texture.fb1));
 #elif LV_COLOR_DEPTH == 32
-        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_BGRA, GL_UNSIGNED_BYTE,
+        GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, disp_width, disp_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                              ctx->texture.fb1));
 #else
 #error("Unsupported color format")
